@@ -1,4 +1,6 @@
 import fitz  # PyMuPDF
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+
 
 def extract_text_from_pdf(file_path: str) -> str:
     """
