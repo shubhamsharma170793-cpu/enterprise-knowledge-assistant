@@ -23,3 +23,11 @@ if uploaded_file:
     st.subheader("Extracted Text:")
     st.write(text[:1000])  # show first 1000 characters for readability
 
+# Chunk after showing preview
+chunks = chunk_text(text)
+
+st.subheader("Chunked Text (First 3 Chunks):")
+for i, chunk in enumerate(chunks[:3], start=1):
+    st.write(f"**Chunk {i}:**")
+    st.write(chunk)
+
