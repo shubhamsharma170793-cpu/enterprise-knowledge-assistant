@@ -21,7 +21,7 @@ if uploaded_file:
 
     # Show extracted text
     st.subheader("Extracted Text:")
-    st.write(text[:1000])  # show first 1000 characters for readability
+    st.write(text[:10000])  # show first 1000 characters for readability
 
 # Chunk after showing preview
 chunks = chunk_text(text)
