@@ -1,5 +1,5 @@
 import streamlit as st
-from ingestion import extract_text_from_pdf
+from ingestion import extract_text_from_pdf, chunk_text
 import os
 
 # App title
