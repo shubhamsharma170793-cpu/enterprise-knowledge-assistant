@@ -1,1 +1,15 @@
+# 1. Document Processing
+pymupdf==1.24.9
+
+# 2. Chunking & Orchestration
+langchain==0.2.12
+
+# 3. Embeddings + LLM
+openai==1.42.0
+
+# 4. Vector Database
+faiss-cpu==1.7.4
+
+# 5. UI Layer
+streamlit==1.38.0
 
