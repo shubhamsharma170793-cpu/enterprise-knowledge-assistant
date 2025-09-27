@@ -19,3 +19,24 @@ def extract_text_from_pdf(file_path: str) -> str:
             text += page.get_text()
     return text
 
+
+
+
+def chunk_text(text: str, chunk_size: int = 500, chunk_overlap: int = 50) -> list:
+    """
+    Splits extracted text into smaller overlapping chunks.
+
+    Args:
+        text (str): The full extracted text.
+        chunk_size (int): Max characters per chunk.
+        chunk_overlap (int): Overlap between chunks.
+
+    Returns:
+        list: List of text chunks.
+    """
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap
+    )
+    return splitter.split_text(text)
+
