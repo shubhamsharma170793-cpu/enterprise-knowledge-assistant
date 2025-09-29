@@ -1,5 +1,6 @@
 import streamlit as st
 from ingestion import extract_text_from_pdf, chunk_text
+from embeddings import generate_embeddings
 import os
 
 # App title
@@ -30,5 +31,9 @@ if uploaded_file:
     for i, chunk in enumerate(chunks[:3], start=1):
         st.write(f"**Chunk {i}:**")
         st.write(chunk)
+
+    # Generate embeddings
+    embeddings = generate_embeddings(chunks)
+    st.success(f"✅ Generated {len(embeddings)} embeddings.")
 else:
     st.info("👆 Please upload a PDF to begin.")
