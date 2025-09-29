@@ -18,13 +18,11 @@ def generate_embeddings(chunks: list) -> list:
     return embeddings.tolist()   # convert to plain Python list
 
 
-
-
-
-
-
-
 """
+----------------------------
+ OLD OPENAI EMBEDDINGS CODE
+ (kept for reference only)
+----------------------------
 from openai import OpenAI   # 📌 library + class
 client = OpenAI()           # 📌 variable (instance of class)
 
