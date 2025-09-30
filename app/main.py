@@ -1,14 +1,20 @@
+import os
 import streamlit as st
 from ingestion import extract_text_from_pdf, chunk_text
 from embeddings import generate_embeddings
-import os
+from vectorstore import build_faiss_index, search_faiss
+from sentence_transformers import SentenceTransformer   # for query embedding
 
-# App title
+# ---------------------------
+# App Title
+# ---------------------------
 st.title("📄 Enterprise Knowledge Assistant (MVP)")
 
-st.write("Upload a PDF to extract and view its text")
+st.write("Upload a PDF, process it, and ask questions about its content.")
 
-# Upload button
+# ---------------------------
+# File Upload
+# ---------------------------
 uploaded_file = st.file_uploader("Choose a PDF file", type="pdf")
 
 if uploaded_file:
@@ -17,23 +23,49 @@ if uploaded_file:
     with open(temp_path, "wb") as f:
         f.write(uploaded_file.getbuffer())
 
-    # Extract text
+    # ---------------------------
+    # Phase 2: Extract Text
+    # ---------------------------
     text = extract_text_from_pdf(temp_path)
 
-    # Show extracted text
-    st.subheader("Extracted Text:")
-    st.write(text[:10000])  # show first 1000 characters for readability
+    st.subheader("📑 Extracted Text (Preview)")
+    st.write(text[:1000])   # preview first 1000 characters
 
-    # Chunk after showing preview
+    # ---------------------------
+    # Phase 3: Chunking
+    # ---------------------------
     chunks = chunk_text(text)
+    st.write(f"📦 Total Chunks Created: {len(chunks)}")
 
-    st.subheader("Chunked Text (First 3 Chunks):")
+    st.subheader("🧩 Chunked Text (First 3 Chunks)")
     for i, chunk in enumerate(chunks[:3], start=1):
-        st.write(f"**Chunk {i}:**")
-        st.write(chunk)
+        st.write(f"**Chunk {i}:** {chunk}")
 
-    # Generate embeddings
+    # ---------------------------
+    # Phase 4: Embeddings
+    # ---------------------------
     embeddings = generate_embeddings(chunks)
     st.success(f"✅ Generated {len(embeddings)} embeddings.")
-else:
-    st.info("👆 Please upload a PDF to begin.")
+
+    # ---------------------------
+    # Phase 5: Vector Store (FAISS)
+    # ---------------------------
+    index = build_faiss_index(embeddings)
+
+    # Load same model for query embedding
+    query_model = SentenceTransformer("all-MiniLM-L6-v2")
+
+    # Input for user queries
+    user_query = st.text_input("🔍 Ask a question about the document:")
+
+    if user_query:
+        # Generate embedding for query
+        query_embedding = query_model.encode([user_query], convert_to_numpy=True)[0]
+
+        # Search FAISS for relevant chunks
+        results = search_faiss(query_embedding, index, chunks, top_k=3)
+
+        # Display results
+        st.subheader("📄 Relevant Chunks")
+        for i, r in enumerate(results, start=1):
+            st.write(f"**Result {i}:** {r}")

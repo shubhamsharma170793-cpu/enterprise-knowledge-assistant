@@ -13,3 +13,6 @@ faiss-cpu==1.12.0
 # 5. UI Layer
 streamlit==1.38.0
 
+sentence-transformers==2.2.2   # ✅ added to replace openai embeddings for no cost
+
+huggingface-hub==0.24.6
