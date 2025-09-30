@@ -1,0 +1,8 @@
+[server]
+headless = true
+enableCORS = false
+port = 7860
+
+[general]
+# Store config/metrics inside your project folder (avoids PermissionError on Hugging Face)
+storageFolder = "./.streamlit"
