@@ -2,7 +2,7 @@
 streamlit==1.39.0
 
 # PDF processing
-pymupdf==1.23.26
+pymupdf==1.22.5
 
 # Text processing & chunking
 langchain==0.2.12
