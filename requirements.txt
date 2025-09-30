@@ -1,18 +1,17 @@
-# 1. Document Processing
+# Core app
+streamlit==1.39.0
+
+# PDF processing
 pymupdf==1.24.9
 
-# 2. Chunking & Orchestration
+# Text processing & chunking
 langchain==0.2.12
 
-# 3. Embeddings + LLM
-openai==1.42.0
+# Embeddings
+sentence-transformers==3.0.1  # ✅ added to replace openai embeddings for no cost
 
-# 4. Vector Database
-faiss-cpu==1.12.0
+# Vector search
+faiss-cpu==1.8.0
 
-# 5. UI Layer
-streamlit==1.38.0
-
-sentence-transformers==2.2.2   # ✅ added to replace openai embeddings for no cost
-
-huggingface-hub==0.24.6
+# Utils
+numpy==1.26.4
