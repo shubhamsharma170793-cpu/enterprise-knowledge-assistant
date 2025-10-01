@@ -59,13 +59,9 @@ if uploaded_file:
     user_query = st.text_input("🔍 Ask a question about the document:")
 
     if user_query:
-        # Generate embedding for query
-        query_embedding = query_model.encode([user_query], convert_to_numpy=True)[0]
+    results = retrieve_chunks(user_query, index, chunks, top_k=3)
 
-        # Search FAISS for relevant chunks
-        results = search_faiss(query_embedding, index, chunks, top_k=3)
+    st.subheader("📄 Relevant Chunks")
+    for i, r in enumerate(results, start=1):
+        st.write(f"**Result {i}:** {r}")
 
-        # Display results
-        st.subheader("📄 Relevant Chunks")
-        for i, r in enumerate(results, start=1):
-            st.write(f"**Result {i}:** {r}")
