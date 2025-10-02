@@ -69,4 +69,4 @@ if uploaded_file:
     # Phase 4: Embeddings
     # ---------------------------
     embeddings = generate_embeddings(chunks)
-    st.success(f"✅ Generated embeddings
+    st.success(f"✅ Generated {len(embeddings)} embeddings.")
