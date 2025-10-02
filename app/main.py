@@ -53,25 +53,22 @@ if uploaded_file:
     # ---------------------------
     index = build_faiss_index(embeddings)
 
-    # Load same model for query embedding
-    query_model = SentenceTransformer("all-MiniLM-L6-v2")
 
     # Input for user queries
     user_query = st.text_input("🔍 Ask a question about the document:")
 
     if user_query:
-    # Phase 6: Retrieve top chunks
-    retrieved = retrieve_chunks(user_query, index, chunks, top_k=3)
+        # Phase 6: Retrieve top chunks
+        retrieved = retrieve_chunks(user_query, index, chunks, top_k=3)
 
-    # Phase 7: Generate answer using Hugging Face model
-    answer = generate_answer(user_query, retrieved)
+        # Phase 7: Generate answer using Hugging Face model
+        answer = generate_answer(user_query, retrieved)
 
-    # Show final answer
-    st.subheader("🤖 Answer")
-    st.write(answer)
+        # Show final answer
+        st.subheader("🤖 Answer")
+        st.write(answer)
 
-    # Optional: show supporting chunks
-    st.subheader("📄 Supporting Chunks")
-    for i, r in enumerate(retrieved, start=1):
-        st.write(f"**Chunk {i}:** {r}")
-
+        # Optional: show supporting chunks
+        st.subheader("📄 Supporting Chunks")
+        for i, r in enumerate(retrieved, start=1):
+            st.write(f"**Chunk {i}:** {r}")
