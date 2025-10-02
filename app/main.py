@@ -7,66 +7,83 @@ from vectorstore import build_faiss_index
 from qa import retrieve_chunks, generate_answer
 
 # ---------------------------
-# Page Config
+# App Config
 # ---------------------------
 st.set_page_config(page_title="Enterprise Knowledge Assistant", layout="wide")
+st.title("📄 Enterprise Knowledge Assistant (MVP)")
+
+st.write("Upload a PDF **or try the sample file** to explore this assistant.")
 
 # ---------------------------
-# Sidebar (Navigation)
+# Sidebar (Settings + Credits)
 # ---------------------------
-st.sidebar.title("⚡ Enterprise Knowledge Assistant")
-st.sidebar.markdown("Upload a PDF or try the sample file to see the assistant in action.")
+with st.sidebar:
+    st.header("⚙️ Settings")
+    chunk_size = st.slider("Chunk Size", 200, 1000, 500, step=100)
+    top_k = st.slider("Top K Results", 1, 5, 3)
 
-# Upload option in sidebar
-uploaded_file = st.sidebar.file_uploader("📂 Upload your PDF", type="pdf")
+    st.markdown("---")
+    st.caption("👨‍💻 Built by Shubham Sharma")
+    st.markdown("[📂 GitHub Repo](https://github.com/shubhamsharma170793-cpu/enterprise-knowledge-assistant)")
 
-# ✅ Sample PDF option
-if st.sidebar.button("📘 Try with Sample PDF"):
-    uploaded_file = open("app/sample.pdf", "rb")  # sample.pdf must exist
+# ---------------------------
+# File Upload Section (Main area)
+# ---------------------------
+uploaded_file = st.file_uploader("📂 Upload your PDF", type="pdf")
+
+if st.button("📘 Try with Sample PDF"):
+    uploaded_file = open("app/sample.pdf", "rb")
     st.session_state["use_sample"] = True
 else:
     st.session_state["use_sample"] = False
 
 # ---------------------------
-# Main App Area
-# ---------------------------
-st.title("📄 Enterprise Knowledge Assistant (MVP)")
-st.markdown("Ask questions about your documents with **AI-powered answers**.")
-
-# ---------------------------
-# File Handling
+# File Handling + Processing
 # ---------------------------
 if uploaded_file:
-    # If user chose sample → use directly, else save uploaded
     if st.session_state.get("use_sample", False):
         temp_path = os.path.join("app", "sample.pdf")
-        st.info("✅ Using **default sample.pdf**")
+        st.info("Using **default sample.pdf** ✅")
     else:
         temp_path = os.path.join("temp.pdf")
         with open(temp_path, "wb") as f:
             f.write(uploaded_file.getbuffer())
-        st.success("✅ PDF uploaded successfully!")
 
-    # ---------------------------
     # Phase 2: Extract Text
-    # ---------------------------
     text = extract_text_from_pdf(temp_path)
-
     st.subheader("📑 Extracted Text (Preview)")
-    st.write(text[:1000])   # show first 1000 chars only
+    st.write(text[:1000])
 
-    # ---------------------------
     # Phase 3: Chunking
-    # ---------------------------
-    chunks = chunk_text(text)
-    st.write(f"📦 Total Chunks Created: **{len(chunks)}**")
+    chunks = chunk_text(text, chunk_size=chunk_size)
+    st.write(f"📦 Total Chunks Created: {len(chunks)}")
 
     st.subheader("🧩 Chunked Text (First 3 Chunks)")
     for i, chunk in enumerate(chunks[:3], start=1):
-        st.markdown(f"**Chunk {i}:** {chunk}")
+        st.write(f"**Chunk {i}:** {chunk}")
 
-    # ---------------------------
     # Phase 4: Embeddings
-    # ---------------------------
     embeddings = generate_embeddings(chunks)
     st.success(f"✅ Generated {len(embeddings)} embeddings.")
+
+    # Phase 5: Vector Store (FAISS)
+    index = build_faiss_index(embeddings)
+
+    # Phase 6 & 7: Q&A
+    user_query = st.text_input("🔍 Ask a question about the document:")
+
+    if user_query:
+        retrieved = retrieve_chunks(user_query, index, chunks, top_k=top_k)
+        answer = generate_answer(user_query, retrieved)
+
+        # Final Answer
+        st.subheader("🤖 Assistant’s Answer")
+        st.write(answer)
+
+        # Supporting Chunks
+        st.subheader("📄 Supporting Chunks")
+        for i, r in enumerate(retrieved, start=1):
+            st.write(f"**Chunk {i}:** {r}")
+
+else:
+    st.warning("⬅️ Please upload a PDF or click **Try with Sample PDF** to continue.")
