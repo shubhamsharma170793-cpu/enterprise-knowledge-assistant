@@ -18,6 +18,7 @@ st.write("Upload a PDF **or try the sample file** to explore this assistant.")
 # Sidebar (Settings + Credits)
 # ---------------------------
 with st.sidebar:
+    st.image("app/logo.png", width=150)   # ✅ Add logo here at top
     st.header("⚙️ Settings")
     chunk_size = st.slider("Chunk Size", 200, 1000, 500, step=100)
     top_k = st.slider("Top K Results", 1, 5, 3)
