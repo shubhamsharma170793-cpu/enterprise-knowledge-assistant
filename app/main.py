@@ -85,6 +85,3 @@ if uploaded_file:
         st.subheader("📄 Supporting Chunks")
         for i, r in enumerate(retrieved, start=1):
             st.write(f"**Chunk {i}:** {r}")
-
-else:
-    st.warning("⬅️ Please upload a PDF or click **Try with Sample PDF** to continue.")
