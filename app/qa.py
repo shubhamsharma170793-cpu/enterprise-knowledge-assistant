@@ -6,7 +6,7 @@ from transformers import pipeline
 # Load embedding model (for query encoding)
 _query_model = SentenceTransformer("all-MiniLM-L6-v2")
 
-# Load Hugging Face generative model (FLAN-T5-small is lightweight, CPU friendly)
+# Load Hugging Face generative model (FLAN-T5-small is free & CPU friendly)
 _answer_model = pipeline("text2text-generation", model="google/flan-t5-small")
 
 
@@ -21,12 +21,24 @@ def generate_answer(query: str, retrieved_chunks: list) -> str:
     if not retrieved_chunks:
         return "Sorry, I could not find relevant information in the document."
 
-    # Combine retrieved chunks into a context
+    # Combine retrieved chunks into a single context
     context = " ".join(retrieved_chunks)
 
-    # Build prompt
-    prompt = f"Answer the following question based on the context:\n\nContext: {context}\n\nQuestion: {query}\n\nAnswer:"
+    # ✅ Stronger prompt to guide the model
+    prompt = f"""
+You are a helpful assistant. 
+Read the context carefully and answer the question with clear, step-by-step instructions. 
+Do not just repeat the context; explain in your own words.
+
+Context:
+{context}
+
+Question:
+{query}
+
+Answer (in numbered steps):
+"""
 
     # Run the Hugging Face pipeline
-    result = _answer_model(prompt, max_length=200, clean_up_tokenization_spaces=True)
+    result = _answer_model(prompt, max_length=300, clean_up_tokenization_spaces=True)
     return result[0]["generated_text"].strip()
