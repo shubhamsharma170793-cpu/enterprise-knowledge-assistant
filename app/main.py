@@ -10,7 +10,7 @@ from qa import retrieve_chunks, generate_answer
 # App Config
 # ---------------------------
 st.set_page_config(page_title="Enterprise Knowledge Assistant", layout="wide")
-st.title("📄 Enterprise Knowledge Assistant (MVP)")
+st.title("📄 Enterprise Knowledge Assistant")
 
 st.write("Upload a PDF **or try the sample file** to explore this assistant.")
 
