@@ -1,87 +1,89 @@
 # app/main.py
-import os
+import os, json
 import streamlit as st
 from ingestion import extract_text_from_pdf, chunk_text
 from embeddings import generate_embeddings
 from vectorstore import build_faiss_index
 from qa import retrieve_chunks, generate_answer
+import faiss
 
 # ---------------------------
 # App Config
 # ---------------------------
 st.set_page_config(page_title="Enterprise Knowledge Assistant", layout="wide")
 st.title("📄 Enterprise Knowledge Assistant")
-
-st.write("Upload a PDF **or try the sample file** to explore this assistant.")
+st.caption("Choose a preloaded PDF or upload your own, then ask questions instantly.")
 
 # ---------------------------
 # Sidebar (Settings + Credits)
 # ---------------------------
 with st.sidebar:
-    st.image("app/logo.png", width=150)   # ✅ Add logo here at top
+    st.image("app/logo.png", width=150)
     st.header("⚙️ Settings")
     chunk_size = st.slider("Chunk Size", 200, 1000, 500, step=100)
     top_k = st.slider("Top K Results", 1, 5, 3)
+
+    st.markdown("---")
+    st.header("📚 Document Library")
+    doc_choice = st.radio(
+        "Select a document:",
+        ["Sample PDF", "Upload Custom PDF"],  # Add more preloaded docs later
+    )
 
     st.markdown("---")
     st.caption("👨‍💻 Built by Shubham Sharma")
     st.markdown("[📂 GitHub Repo](https://github.com/shubhamsharma170793-cpu/enterprise-knowledge-assistant)")
 
 # ---------------------------
-# File Upload Section (Main area)
+# Document Handling
 # ---------------------------
-uploaded_file = st.file_uploader("📂 Upload your PDF", type="pdf")
+text, chunks, index = None, None, None
 
-if st.button("📘 Try with Sample PDF"):
-    uploaded_file = open("app/sample.pdf", "rb")
-    st.session_state["use_sample"] = True
-else:
-    st.session_state["use_sample"] = False
-
-# ---------------------------
-# File Handling + Processing
-# ---------------------------
-if uploaded_file:
-    if st.session_state.get("use_sample", False):
-        temp_path = os.path.join("app", "sample.pdf")
-        st.info("Using **default sample.pdf** ✅")
-    else:
-        temp_path = os.path.join("temp.pdf")
-        with open(temp_path, "wb") as f:
-            f.write(uploaded_file.getbuffer())
-
-    # Phase 2: Extract Text
+if doc_choice == "Sample PDF":
+    # Preloaded sample
+    temp_path = os.path.join("app", "sample.pdf")
+    st.info("Using **default sample.pdf** ✅")
     text = extract_text_from_pdf(temp_path)
-    st.subheader("📑 Extracted Text (Preview)")
-    st.write(text[:1000])
-
-    # Phase 3: Chunking
     chunks = chunk_text(text, chunk_size=chunk_size)
-    st.write(f"📦 Total Chunks Created: {len(chunks)}")
-
-    st.subheader("🧩 Chunked Text (First 3 Chunks)")
-    for i, chunk in enumerate(chunks[:3], start=1):
-        st.write(f"**Chunk {i}:** {chunk}")
-
-    # Phase 4: Embeddings
     embeddings = generate_embeddings(chunks)
-    st.success(f"✅ Generated {len(embeddings)} embeddings.")
-
-    # Phase 5: Vector Store (FAISS)
     index = build_faiss_index(embeddings)
 
-    # Phase 6 & 7: Q&A
-    user_query = st.text_input("🔍 Ask a question about the document:")
+elif doc_choice == "Upload Custom PDF":
+    uploaded_file = st.file_uploader("📂 Upload your PDF", type="pdf")
+    if uploaded_file:
+        temp_path = "temp.pdf"
+        with open(temp_path, "wb") as f:
+            f.write(uploaded_file.getbuffer())
+        st.success("✅ Document uploaded and processed!")
 
+        text = extract_text_from_pdf(temp_path)
+        chunks = chunk_text(text, chunk_size=chunk_size)
+        embeddings = generate_embeddings(chunks)
+        index = build_faiss_index(embeddings)
+
+# ---------------------------
+# Show Document Preview (if available)
+# ---------------------------
+if chunks:
+    st.subheader("📑 Document Preview")
+    st.text_area("Extracted text (first 1000 chars)", text[:1000], height=150)
+    st.caption(f"📦 {len(chunks)} chunks created")
+
+# ---------------------------
+# Query Section
+# ---------------------------
+if index and chunks:
+    st.markdown("---")
+    st.subheader("🤖 Ask a Question")
+
+    user_query = st.text_input("🔍 Your question about the document:")
     if user_query:
         retrieved = retrieve_chunks(user_query, index, chunks, top_k=top_k)
         answer = generate_answer(user_query, retrieved)
 
-        # Final Answer
-        st.subheader("🤖 Assistant’s Answer")
+        st.markdown("### ✅ Assistant’s Answer")
         st.write(answer)
 
-        # Supporting Chunks
-        st.subheader("📄 Supporting Chunks")
-        for i, r in enumerate(retrieved, start=1):
-            st.write(f"**Chunk {i}:** {r}")
+        with st.expander("📄 Supporting Chunks"):
+            for i, r in enumerate(retrieved, start=1):
+                st.markdown(f"**Chunk {i}:** {r}")
