@@ -25,3 +25,7 @@ numpy                    # Needed for FAISS and math ops
 # ----------------------------------------
 transformers==4.44.2     # Hugging Face library for LLM pipelines
 torch==2.2.2+cpu         # CPU-only PyTorch (lighter, avoids GPU issues)
+
+# Hugging Face Transformers + PyTorch
+transformers==4.48.3
+torch==2.8.0
