@@ -31,6 +31,19 @@ with st.sidebar:
 # ---------------------------
 uploaded_file = st.file_uploader("📂 Upload a PDF document", type="pdf")
 
+# ---------------------------
+# 👋 Landing Page (when no file uploaded)
+# ---------------------------
+if not uploaded_file:
+    st.markdown("### 👋 Welcome!")
+    st.write("Upload a PDF document to get started. Once uploaded:")
+    st.markdown("""
+    1. We'll extract the text from your PDF  
+    2. Split it into manageable chunks  
+    3. Generate embeddings for semantic search  
+    4. Let you ask questions and get AI-powered answers  
+    """)
+
 if uploaded_file:
     # Save uploaded file temporarily
     temp_path = os.path.join("temp.pdf")
