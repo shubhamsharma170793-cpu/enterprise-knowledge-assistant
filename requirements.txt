@@ -1,17 +1,27 @@
-# Core app
-streamlit==1.39.0
+# ----------------------------------------
+# Core framework
+# ----------------------------------------
+streamlit==1.39.0        # Web UI framework
 
+# ----------------------------------------
 # PDF processing
-pymupdf==1.22.5
+# ----------------------------------------
+pymupdf==1.22.5          # For extracting text from PDFs (fitz)
 
-# Text processing & chunking
-langchain==0.2.12
+# ----------------------------------------
+# Embeddings & NLP
+# ----------------------------------------
+langchain==0.2.12            # Provides text splitters, utilities
+sentence-transformers==3.0.1 # Embeddings (all-MiniLM-L6-v2)
 
-# Embeddings
-sentence-transformers==3.0.1  # ✅ added to replace openai embeddings for no cost
-
+# ----------------------------------------
 # Vector search
-faiss-cpu==1.12.0
+# ----------------------------------------
+faiss-cpu==1.9.0         # Vector database for semantic search
+numpy                    # Needed for FAISS and math ops
 
-# Utils
-numpy==1.26.4
+# ----------------------------------------
+# Hugging Face models
+# ----------------------------------------
+transformers==4.44.2     # Hugging Face library for LLM pipelines
+torch==2.2.2+cpu         # CPU-only PyTorch (lighter, avoids GPU issues)
