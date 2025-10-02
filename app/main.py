@@ -2,8 +2,9 @@ import os
 import streamlit as st
 from ingestion import extract_text_from_pdf, chunk_text
 from embeddings import generate_embeddings
-from vectorstore import build_faiss_index, search_faiss
-from sentence_transformers import SentenceTransformer   # for query embedding
+from vectorstore import build_faiss_index
+from qa import retrieve_chunks, generate_answer   # <-- NEW
+
 
 # ---------------------------
 # App Title
@@ -59,9 +60,18 @@ if uploaded_file:
     user_query = st.text_input("🔍 Ask a question about the document:")
 
     if user_query:
-    results = retrieve_chunks(user_query, index, chunks, top_k=3)
+    # Phase 6: Retrieve top chunks
+    retrieved = retrieve_chunks(user_query, index, chunks, top_k=3)
 
-    st.subheader("📄 Relevant Chunks")
-    for i, r in enumerate(results, start=1):
-        st.write(f"**Result {i}:** {r}")
+    # Phase 7: Generate answer using Hugging Face model
+    answer = generate_answer(user_query, retrieved)
+
+    # Show final answer
+    st.subheader("🤖 Answer")
+    st.write(answer)
+
+    # Optional: show supporting chunks
+    st.subheader("📄 Supporting Chunks")
+    for i, r in enumerate(retrieved, start=1):
+        st.write(f"**Chunk {i}:** {r}")
 
