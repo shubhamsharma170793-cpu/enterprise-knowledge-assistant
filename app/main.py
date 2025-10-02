@@ -12,10 +12,10 @@ import faiss
 # ---------------------------
 st.set_page_config(page_title="Enterprise Knowledge Assistant", layout="wide")
 st.title("📄 Enterprise Knowledge Assistant")
-st.caption("Choose a preloaded PDF or upload your own, then ask questions instantly.")
+st.caption("Select a document from the library or upload your own, then ask questions.")
 
 # ---------------------------
-# Sidebar (Settings + Credits)
+# Sidebar (Settings + Docs + Credits)
 # ---------------------------
 with st.sidebar:
     st.image("app/logo.png", width=150)
@@ -25,9 +25,11 @@ with st.sidebar:
 
     st.markdown("---")
     st.header("📚 Document Library")
+    # 🆕 Default is "-- Select --"
     doc_choice = st.radio(
-        "Select a document:",
-        ["Sample PDF", "Upload Custom PDF"],  # Add more preloaded docs later
+        "Choose a document:",
+        ["-- Select --", "Sample PDF", "Upload Custom PDF"],
+        index=0
     )
 
     st.markdown("---")
@@ -39,10 +41,12 @@ with st.sidebar:
 # ---------------------------
 text, chunks, index = None, None, None
 
-if doc_choice == "Sample PDF":
-    # Preloaded sample
+if doc_choice == "-- Select --":
+    st.info("⬅️ Please choose **Sample PDF** or **Upload Custom PDF** from the sidebar to continue.")
+
+elif doc_choice == "Sample PDF":
     temp_path = os.path.join("app", "sample.pdf")
-    st.info("Using **default sample.pdf** ✅")
+    st.success("📘 Sample PDF selected")
     text = extract_text_from_pdf(temp_path)
     chunks = chunk_text(text, chunk_size=chunk_size)
     embeddings = generate_embeddings(chunks)
@@ -62,7 +66,7 @@ elif doc_choice == "Upload Custom PDF":
         index = build_faiss_index(embeddings)
 
 # ---------------------------
-# Show Document Preview (if available)
+# Document Preview
 # ---------------------------
 if chunks:
     st.subheader("📑 Document Preview")
