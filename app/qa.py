@@ -1,6 +1,6 @@
 # app/qa.py
 from sentence_transformers import SentenceTransformer
-from vector import search_faiss
+from vectorstore import search_faiss
 from transformers import pipeline
 
 # Load embedding model (for query encoding)
