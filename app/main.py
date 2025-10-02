@@ -19,13 +19,9 @@ st.caption("Select a document from the library or upload your own, then ask ques
 # ---------------------------
 with st.sidebar:
     st.image("app/logo.png", width=150)
-    st.header("⚙️ Settings")
-    chunk_size = st.slider("Chunk Size", 200, 1000, 500, step=100)
-    top_k = st.slider("Top K Results", 1, 5, 3)
 
-    st.markdown("---")
+    # 1. Document Library FIRST
     st.header("📚 Document Library")
-    # 🆕 Default is "-- Select --"
     doc_choice = st.radio(
         "Choose a document:",
         ["-- Select --", "Sample PDF", "Upload Custom PDF"],
@@ -33,6 +29,15 @@ with st.sidebar:
     )
 
     st.markdown("---")
+
+    # 2. Settings SECOND
+    st.header("⚙️ Settings")
+    chunk_size = st.slider("Chunk Size", 200, 1000, 500, step=100)
+    top_k = st.slider("Top K Results", 1, 5, 3)
+
+    st.markdown("---")
+
+    # 3. Branding / Credits LAST
     st.caption("👨‍💻 Built by Shubham Sharma")
     st.markdown("[📂 GitHub Repo](https://github.com/shubhamsharma170793-cpu/enterprise-knowledge-assistant)")
 
