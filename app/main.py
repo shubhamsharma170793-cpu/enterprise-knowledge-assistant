@@ -44,6 +44,10 @@ if not uploaded_file:
     4. Let you ask questions and get AI-powered answers  
     """)
 
+    # ✅ Sample PDF button
+    if st.button("📘 Try with Sample PDF"):
+        uploaded_file = open("sample.pdf", "rb")  # make sure sample.pdf exists in your repo
+
 if uploaded_file:
     # Save uploaded file temporarily
     temp_path = os.path.join("temp.pdf")
